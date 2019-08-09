@@ -26,9 +26,34 @@
     </ul>
   </div>
 </nav>
-  
-    <h1>Hello, world!</h1>
-
+  <div class="container">
+    <h1>list</h1>
+	
+	<table class="table">
+  <thead>
+    <tr>
+    	 <th scope="col">no</th>
+      <th scope="col">아이디</th>
+      <th scope="col">패스워드</th>
+      <th scope="col">이름</th>
+      <th scope="col">이메일</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#users}}
+    <tr>
+    
+      <th scope="row">1</th>
+      <td>{{userId}}</td>
+      <td>{{password}}</td>
+      <td>{{email}}</td>
+      <td>{{name}}</td>
+      
+    </tr>
+    {{/users}}
+  </tbody>
+</table>
+	</div>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="/webjars/jquery/3.3.1/dist/jquery.slim.min.js"></script>
