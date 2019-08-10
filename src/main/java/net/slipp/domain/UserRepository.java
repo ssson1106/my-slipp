@@ -1,5 +1,6 @@
 package net.slipp.domain;
 
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, Long>{
@@ -7,4 +8,6 @@ public interface UserRepository extends JpaRepository<User, Long>{
 	//JpaRepository<연결할 객체 VO, key값 데이터 타입>
 	
 	//내부에 기본적으로 selectone insert update 기본적으로 다있다 그거 그냥 쓰는듯
+	
+	public User findByUserId(String userId); 
 }
