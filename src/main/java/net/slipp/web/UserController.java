@@ -1,32 +1,60 @@
 package net.slipp.web;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import net.slipp.domain.User;
+import net.slipp.domain.UserRepository;
 
 @Controller
+@RequestMapping("/user")
 public class UserController {
-	private List<User> users = new ArrayList<User>();
 	
-	@PostMapping("/create")
-	public ModelAndView create(User user) {
-		ModelAndView mav = new ModelAndView();
+	@Autowired
+	private UserRepository userRepository;
+	
+	@GetMapping("/form")
+	public String form() {
+		System.out.println("form");
+		return "/user/form";
+	}
+	
+	@PostMapping("")
+	public String create(User user) {
 		System.out.println("create user = " + user);
-		users.add(user);
-		mav.setViewName("redirect:list");
-		return mav;
+		userRepository.save(user);
+		return "redirect:/user";
 	}
 	
-	@GetMapping("/list")
+	@GetMapping("")
 	public String list(Model model) {
-		
-		model.addAttribute("users", users);
-		return "list";
+		System.out.println("get /users list");
+		model.addAttribute("users", userRepository.findAll());
+		return "/user/list";
 	}
 	
+	@GetMapping("/{id}/form")
+	public String updateForm(@PathVariable Long id, Model model) {
+		System.out.println("updateForm "+id);
+		Optional<User> user = userRepository.findById(id);
+		model.addAttribute("user", user.get());
+		return "/user/updateForm";
+	}
+	
+	@PutMapping("/{id}")
+	public String update(@PathVariable Long id, Model model, User updateUser) {
+		System.out.println("update");
+		User user = userRepository.getOne(id);
+		user.update(updateUser);
+		userRepository.save(user);
+		return "redirect:/user";
+	}
 }

@@ -1,11 +1,36 @@
-package net.slipp.web;
+package net.slipp.domain;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Entity
 public class User {
+	@Id //USER TABLE의 키값이다 선언
+	@GeneratedValue //데이터베이스에서 자동으로 1씩 증가
+	private Long id;
+	
+	@Column(nullable = false, length = 20)
 	private String userId;
 	private String password;
 	private String name;
 	private String email;
 	
+	public void update(User updateUser) {
+		this.password = updateUser.getPassword();
+		this.name = updateUser.getName();
+		this.email = updateUser.getEmail();
+	}
+	
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
 	public String getUserId() {
 		return userId;
 	}
