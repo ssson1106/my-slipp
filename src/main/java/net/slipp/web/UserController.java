@@ -42,10 +42,10 @@ public class UserController {
 		model.addAttribute("users", userRepository.findAll());
 		return "/user/list";
 	}
-	
+	/*
 	@GetMapping("/{id}/form")
 	public String updateForm(@PathVariable Long id, Model model, HttpSession session) {
-		User sessionedUser = (User)session.getAttribute("sessionedUser"); 
+		User sessionedUser = (User)session.getAttribute(HttpSessionUtils.USER_SESSION_KEY); 
 		//Optional<User> user = userRepository.findById(id);
 		//자신의 정보만 수정할수 있도록 수정
 		if(sessionedUser == null) {//로그인 상태인지만 체크
@@ -58,18 +58,31 @@ public class UserController {
 		
 		model.addAttribute("user", sessionedUser);
 		return "/user/updateForm";
+	}*/
+	
+	@GetMapping("/{id}/form")
+	public String updateForm(@PathVariable Long id, Model model, HttpSession session) {
+		if(!HttpSessionUtils.isLoginUser(session)) {//로그인 상태인지만 체크
+			return "redirect:/user/loginForm";
+		}
+		User sessionedUser = HttpSessionUtils.getUserFromSession(session);
+		if(!sessionedUser.matchId(id)) {//자신의 아이디인지 체크
+			throw new IllegalStateException("자신의 정보만 수정할 수 있습니다.");
+		}
+		
+		model.addAttribute("user", sessionedUser);
+		return "/user/updateForm";
 	}
 	
 	@PutMapping("/{id}")
 	public String update(@PathVariable Long id, Model model, User updateUser,
 				HttpSession session) {
 		System.out.println("update");
-		User sessionedUser = (User)session.getAttribute("sessionedUser"); 
-		if(sessionedUser == null) {//로그인 상태인지만 체크
+		if(!HttpSessionUtils.isLoginUser(session)) {//로그인 상태인지만 체크
 			return "redirect:/user/loginForm";
 		}
-		
-		if(id != sessionedUser.getId()) {//자신의 아이디인지 체크
+		User sessionedUser = HttpSessionUtils.getUserFromSession(session);
+		if(!sessionedUser.matchId(id)) {//자신의 아이디인지 체크
 			throw new IllegalStateException("자신의 정보만 수정할 수 있습니다.");
 		}
 		
@@ -87,15 +100,16 @@ public class UserController {
 	@PostMapping("/login")
 	public String login(String userId, String password, HttpSession session) {
 		User user = userRepository.findByUserId(userId);
-		System.out.println(user);
+		
 		if(user == null) {
 			return "redirect:/user/loginForm";
 		}
-		if(!password.equals(user.getPassword())) {
+		if(!user.matchPassword(password)) {
 			return "redirect:/user/loginForm";
 		}
-		System.out.println("success");
-		session.setAttribute("sessionedUser", user);
+		
+		System.out.println("Login Success");
+		session.setAttribute(HttpSessionUtils.USER_SESSION_KEY, user);
 		return "redirect:/";
 	}
 	
