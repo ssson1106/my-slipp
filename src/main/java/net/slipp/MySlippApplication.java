@@ -9,5 +9,5 @@ public class MySlippApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(MySlippApplication.class, args);
 	}
-
+	
 }

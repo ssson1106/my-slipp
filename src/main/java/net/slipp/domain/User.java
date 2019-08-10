@@ -13,7 +13,7 @@ public class User {
 	private Long id;
 	//스프링 부트 2점 대로 업그레이드 하면서 stratege 설정 해줘야 오토인크리먼트 먹히는듯 하다
 	
-	@Column(nullable = false, length = 20)
+	@Column(nullable = false, length = 20, unique=true)
 	private String userId;
 	private String password;
 	private String name;

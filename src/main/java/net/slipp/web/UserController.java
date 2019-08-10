@@ -44,16 +44,35 @@ public class UserController {
 	}
 	
 	@GetMapping("/{id}/form")
-	public String updateForm(@PathVariable Long id, Model model) {
-		System.out.println("updateForm "+id);
-		Optional<User> user = userRepository.findById(id);
-		model.addAttribute("user", user.get());
+	public String updateForm(@PathVariable Long id, Model model, HttpSession session) {
+		User sessionedUser = (User)session.getAttribute("sessionedUser"); 
+		//Optional<User> user = userRepository.findById(id);
+		//자신의 정보만 수정할수 있도록 수정
+		if(sessionedUser == null) {//로그인 상태인지만 체크
+			return "redirect:/user/loginForm";
+		}
+		
+		if(id != sessionedUser.getId()) {//자신의 아이디인지 체크
+			throw new IllegalStateException("자신의 정보만 수정할 수 있습니다.");
+		}
+		
+		model.addAttribute("user", sessionedUser);
 		return "/user/updateForm";
 	}
 	
 	@PutMapping("/{id}")
-	public String update(@PathVariable Long id, Model model, User updateUser) {
+	public String update(@PathVariable Long id, Model model, User updateUser,
+				HttpSession session) {
 		System.out.println("update");
+		User sessionedUser = (User)session.getAttribute("sessionedUser"); 
+		if(sessionedUser == null) {//로그인 상태인지만 체크
+			return "redirect:/user/loginForm";
+		}
+		
+		if(id != sessionedUser.getId()) {//자신의 아이디인지 체크
+			throw new IllegalStateException("자신의 정보만 수정할 수 있습니다.");
+		}
+		
 		User user = userRepository.getOne(id);
 		user.update(updateUser);
 		userRepository.save(user);
