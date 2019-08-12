@@ -63,34 +63,43 @@ public class QuestionController {
 	}
 	
 	@PutMapping("/{id}")
-	public String update(@PathVariable Long id, String title, String contents, HttpSession session) {
-		if(!HttpSessionUtils.isLoginUser(session)) {
+	public String update(@PathVariable Long id, String title, String contents, 
+			HttpSession session, Model model) {
+		try {
+			Question question = questionRepository.getOne(id);
+			hasPermission(session, question);
+			question.update(title, contents);
+			questionRepository.save(question);
+			return "redirect:/questions/"+id;
+		} catch (IllegalStateException e) {
+			model.addAttribute("errorMessage", e.getMessage());
 			return "redirect:/user/loginForm";
 		}
-		Question question = questionRepository.getOne(id);
-		User loginUser = HttpSessionUtils.getUserFromSession(session);
-		if(!question.isSameWriter(loginUser)) {
-			return "redirect:/user/loginForm";
-		}
-		question.update(title, contents);
-		questionRepository.save(question);
-		return "redirect:/questions/"+id;
+		
 	}
 	
 	@DeleteMapping("/{id}")
-	public String delete(@PathVariable Long id, HttpSession session) {
-		System.out.println("delete question = "+id);
+	public String delete(@PathVariable Long id, HttpSession session, Model model) {
+		try {
+			Question question = questionRepository.getOne(id);
+			hasPermission(session, question);
+			questionRepository.deleteById(id);
+			return "redirect:/";
+		} catch (IllegalStateException e) {
+			model.addAttribute("errorMessage", e.getMessage());
+			return "redirect:/user/loginForm";
+		}
+		
+		
+	}
+	
+	public void hasPermission(HttpSession session, Question question) {
 		if(!HttpSessionUtils.isLoginUser(session)) {
-			return "redirect:/user/loginForm";
+			throw new IllegalStateException("로그인이 필요합니다.");
 		}
-		Question question = questionRepository.getOne(id);
-		System.out.println(question);
 		User loginUser = HttpSessionUtils.getUserFromSession(session);
-		System.out.println(loginUser);
 		if(!question.isSameWriter(loginUser)) {
-			return "redirect:/user/loginForm";
+			throw new IllegalStateException("자신이 쓴 글만 수정, 삭제가 가능합니다.");
 		}
-		questionRepository.deleteById(id);
-		return "redirect:/";
 	}
 }
