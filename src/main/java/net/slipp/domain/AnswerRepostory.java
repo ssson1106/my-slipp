@@ -2,8 +2,7 @@ package net.slipp.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface AnswerRepostory extends JpaRepository<Question, Long>{
+public interface AnswerRepostory extends JpaRepository<Answer, Long>{
 
-	void save(Answer newAnswer);
 
 }

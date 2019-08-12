@@ -69,8 +69,8 @@ public class UserController {
 		if(!sessionedUser.matchId(id)) {//자신의 아이디인지 체크
 			throw new IllegalStateException("자신의 정보만 수정할 수 있습니다.");
 		}
-		
-		model.addAttribute("user", sessionedUser);
+		User user = userRepository.findById(id).get();
+		model.addAttribute("user", user);
 		return "/user/updateForm";
 	}
 	

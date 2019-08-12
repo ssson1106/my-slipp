@@ -18,7 +18,7 @@ public class MySlippApplicationInitializer extends SpringBootServletInitializer	
 	 * 3. 다시 킬하고 
 	 * 4. 변경된 소스코드 서버에 다운
 	 * 5. ./mvnw clean package 명령으로 war 파일로 패키징한다.
-	 * 6. 소스의 target 폴더 안에 있는 패키징한 버전의 폴더 또는 war 파일을 배포한다.
+	 * 6. 소스의 target 폴더 안에 있는 패키징한 버전의 폴더 와 war 파일이 있는것을 확인.
 	 * 7. tomcat/webapps/ 폴더 안에다가 우리의 패키지를 넣어준다.
 	 * 8. 폴더 안의 ROOT 폴더가 기본 폴더라고 한다.
 	 * 9. ROOT 폴더 삭제하고 우리의 폴더를 복사해서 넣고 ROOT 폴더로 만들어준다.
@@ -29,4 +29,15 @@ public class MySlippApplicationInitializer extends SpringBootServletInitializer	
 	 * 13. 서버 shutdown 하고 싶으면 tomcat/bin 안에 shutdown.sh 쓰면 됨  
 	 * 14. jar로 하면 정적 파일들에서 문제점 생길 수도 있다고 한다. 왜 그런지는 검색해보면 될듯
 	 * */
+	
+	/* cd my-slipp
+	 * git pull
+	 * mvnw clean package
+	 * tomcat/bin/shutdown.sh
+	 * cd target
+	 * mv my-slipp-1.0 ~/tomcat/webapps/ROOT  -와르파일 말고 폴더만 옮겨도 되는듯
+	 * tomcat/bin/startup.sh
+	 * 
+	 * 일련의 과정을 쉘 스크립트 만들어서 돌리는게 좋다.
+	 */
 }

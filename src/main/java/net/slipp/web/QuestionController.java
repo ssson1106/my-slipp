@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import net.slipp.domain.Question;
 import net.slipp.domain.QuestionRepostory;
+import net.slipp.domain.Result;
 import net.slipp.domain.User;
 
 @Controller
@@ -55,13 +56,57 @@ public class QuestionController {
 	
 	@GetMapping("/{id}/form")
 	public String form(@PathVariable Long id, HttpSession session, Model model) {
-		if(!HttpSessionUtils.isLoginUser(session)) {
-			return "redirect:/user/loginForm";
+		Question question = questionRepository.getOne(id);
+		Result result = valid(session, question);
+		if( !result.isValid() ) {
+			System.out.println("fail \n" + result);
+			model.addAttribute("result", result);
+			return "/user/login";
 		}
 		model.addAttribute("question", questionRepository.findById(id).get());
 		return "/qna/updateForm";
 	}
 	
+	@PutMapping("/{id}")
+	public String update(@PathVariable Long id, String title, String contents, 
+			HttpSession session, Model model) {
+		Question question = questionRepository.getOne(id);
+		Result result = valid(session, question);
+		if( !result.isValid() ) {
+			System.out.println("fail \n" + result);
+			model.addAttribute("result", result);
+			return "/user/login";
+		}
+		question.update(title, contents);
+		questionRepository.save(question);
+		return "redirect:/questions/"+id;
+	}
+	
+	@DeleteMapping("/{id}")
+	public String delete(@PathVariable Long id, HttpSession session, Model model) {
+		Question question = questionRepository.findById(id).get();
+		Result result = valid(session, question);
+		if( !result.isValid() ) {
+			model.addAttribute("result", result);
+			return "/user/login";
+		}
+		System.out.println("delete\n"+question);
+		questionRepository.delete(question);
+		
+		return "redirect:/";
+	}
+	
+	public Result valid(HttpSession session, Question question) {
+		if(!HttpSessionUtils.isLoginUser(session)) {
+			return Result.fail("로그인이 필요합니다.");
+		}
+		User loginUser = HttpSessionUtils.getUserFromSession(session);
+		if(!question.isSameWriter(loginUser)) {
+			return Result.fail("자신이 쓴 글만 수정, 삭제가 가능합니다.");
+		}
+		return Result.ok();
+	}
+	/*
 	@PutMapping("/{id}")
 	public String update(@PathVariable Long id, String title, String contents, 
 			HttpSession session, Model model) {
@@ -89,10 +134,7 @@ public class QuestionController {
 			model.addAttribute("errorMessage", e.getMessage());
 			return "redirect:/user/loginForm";
 		}
-		
-		
 	}
-	
 	public void hasPermission(HttpSession session, Question question) {
 		if(!HttpSessionUtils.isLoginUser(session)) {
 			throw new IllegalStateException("로그인이 필요합니다.");
@@ -102,4 +144,7 @@ public class QuestionController {
 			throw new IllegalStateException("자신이 쓴 글만 수정, 삭제가 가능합니다.");
 		}
 	}
+	*/
+	
 }
+
